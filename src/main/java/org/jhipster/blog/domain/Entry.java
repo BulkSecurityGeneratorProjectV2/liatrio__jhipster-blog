@@ -1,0 +1,154 @@
+package org.jhipster.blog.domain;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import javax.persistence.*;
+import javax.validation.constraints.*;
+
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.Objects;
+
+/**
+ * A Entry.
+ */
+@Entity
+@Table(name = "entry")
+@Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Entry implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
+    @SequenceGenerator(name = "sequenceGenerator")
+    private Long id;
+
+    @NotNull
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    
+    @Lob
+    @Column(name = "content", nullable = false)
+    private String content;
+
+    @NotNull
+    @Column(name = "jhi_date", nullable = false)
+    private Instant date;
+
+    @ManyToOne
+    @JsonIgnoreProperties("")
+    private Blog blog;
+
+    @ManyToOne
+    @JsonIgnoreProperties("entries")
+    private Tag tag;
+
+    // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Entry title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Entry content(String content) {
+        this.content = content;
+        return this;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public Entry date(Instant date) {
+        this.date = date;
+        return this;
+    }
+
+    public void setDate(Instant date) {
+        this.date = date;
+    }
+
+    public Blog getBlog() {
+        return blog;
+    }
+
+    public Entry blog(Blog blog) {
+        this.blog = blog;
+        return this;
+    }
+
+    public void setBlog(Blog blog) {
+        this.blog = blog;
+    }
+
+    public Tag getTag() {
+        return tag;
+    }
+
+    public Entry tag(Tag tag) {
+        this.tag = tag;
+        return this;
+    }
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Entry entry = (Entry) o;
+        if (entry.getId() == null || getId() == null) {
+            return false;
+        }
+        return Objects.equals(getId(), entry.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "Entry{" +
+            "id=" + getId() +
+            ", title='" + getTitle() + "'" +
+            ", content='" + getContent() + "'" +
+            ", date='" + getDate() + "'" +
+            "}";
+    }
+}

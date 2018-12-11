@@ -37,6 +37,8 @@
     "nativeLanguage": "en",
     "languages": [
       "en"
-    ]
+    ],
+    "herokuAppName": "bens-ironic-blog-demo",
+    "herokuDeployType": "git"
   }
 }
