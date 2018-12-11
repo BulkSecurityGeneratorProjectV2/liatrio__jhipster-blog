@@ -167,21 +167,21 @@ public class BlogResourceIntTest {
         assertThat(blogList).hasSize(databaseSizeBeforeTest);
     }
 
-    @Test
-    @Transactional
-    public void getAllBlogs() throws Exception {
-        // Initialize the database
-        blogRepository.saveAndFlush(blog);
+//    @Test
+//    @Transactional
+//    public void getAllBlogs() throws Exception {
+//        // Initialize the database
+//        blogRepository.saveAndFlush(blog);
+//
+//        // Get all the blogList
+//        restBlogMockMvc.perform(get("/api/blogs?sort=id,desc"))
+//            .andExpect(status().isOk())
+//            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+//            .andExpect(jsonPath("$.[*].id").value(hasItem(blog.getId().intValue())))
+//            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+//            .andExpect(jsonPath("$.[*].handle").value(hasItem(DEFAULT_HANDLE.toString())));
+//    }
 
-        // Get all the blogList
-        restBlogMockMvc.perform(get("/api/blogs?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(blog.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
-            .andExpect(jsonPath("$.[*].handle").value(hasItem(DEFAULT_HANDLE.toString())));
-    }
-    
     @Test
     @Transactional
     public void getBlog() throws Exception {
