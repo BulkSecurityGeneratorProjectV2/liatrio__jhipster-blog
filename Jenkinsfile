@@ -41,7 +41,7 @@ pipeline {
         }
         stage('package and deploy') {
             environment {
-                HEROKU_API_KEY=credential('heroku')
+                HEROKU_API_KEY=credentials('heroku')
             }
             steps {
                 sh "./mvnw com.heroku.sdk:heroku-maven-plugin:2.0.5:deploy -DskipTests -Pprod -Dheroku.buildpacks=heroku/jvm -Dheroku.appName=bens-ironic-blog-demo"
