@@ -1,69 +1,72 @@
-#!/usr/bin/env groovy
-
-node {
-    stage('checkout') {
-        checkout scm
+pipeline {
+    agent {
+        docker {
+            image 'jhipster/jhipster:v5.7.0'
+            args '-u root -e MAVEN_OPTS="-Duser.home=./"'
+        }
     }
-
-    docker.image('jhipster/jhipster:v5.7.0').inside('-u root -e MAVEN_OPTS="-Duser.home=./"') {
+    stages {
         stage('check java') {
-            sh "java -version"
+            steps {
+                sh "java -version"
+            }
         }
-
         stage('clean') {
-            sh "chmod +x mvnw"
-            sh "./mvnw clean"
+            steps {
+                sh "chmod +x mvnw"
+                sh "./mvnw clean"
+            }
         }
-
         stage('install tools') {
-            sh "./mvnw com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v10.13.0 -DnpmVersion=6.4.1"
+            steps {
+                sh "./mvnw com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v10.13.0 -DnpmVersion=6.4.1"
+            }
         }
-
         stage('npm install') {
-            sh "./mvnw com.github.eirslett:frontend-maven-plugin:npm"
+            steps {
+                sh "./mvnw com.github.eirslett:frontend-maven-plugin:npm"
+            }
         }
-
         stage('backend tests') {
-            try {
+            steps {
                 sh "./mvnw test"
-            } catch(err) {
-                throw err
-            } finally {
                 junit '**/target/surefire-reports/TEST-*.xml'
             }
         }
-
         stage('frontend tests') {
-            try {
+            steps {
                 sh "./mvnw com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='test -- -u'"
-            } catch(err) {
-                throw err
-            } finally {
                 junit '**/target/test-results/jest/TESTS-*.xml'
             }
         }
-
         stage('package and deploy') {
-            sh "./mvnw com.heroku.sdk:heroku-maven-plugin:2.0.5:deploy -DskipTests -Pprod -Dheroku.buildpacks=heroku/jvm -Dheroku.appName=bens-ironic-blog-demo"
-            archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
-        }
-        stage('quality analysis') {
-            withSonarQubeEnv('sonar') {
-                sh "./mvnw sonar:sonar"
+            environment {
+                HEROKU_API_KEY=credential('heroku')
+            }
+            steps {
+                sh "./mvnw com.heroku.sdk:heroku-maven-plugin:2.0.5:deploy -DskipTests -Pprod -Dheroku.buildpacks=heroku/jvm -Dheroku.appName=bens-ironic-blog-demo"
+                archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
             }
         }
     }
-
-    def dockerImage
-    stage('build docker') {
-        sh "cp -R src/main/docker target/"
-        sh "cp target/*.war target/docker/"
-        dockerImage = docker.build('docker-login/blog', 'target/docker')
-    }
-
-    stage('publish docker') {
-        docker.withRegistry('https://registry.hub.docker.com', 'docker-login') {
-            dockerImage.push 'latest'
-        }
-    }
 }
+//    docker.image('jhipster/jhipster:v5.7.0').inside('-u root -e MAVEN_OPTS="-Duser.home=./"') {
+//        stage('quality analysis') {
+//            withSonarQubeEnv('sonar') {
+//                sh "./mvnw sonar:sonar"
+//            }
+//        }
+//    }
+//
+//    def dockerImage
+//    stage('build docker') {
+//        sh "cp -R src/main/docker target/"
+//        sh "cp target/*.war target/docker/"
+//        dockerImage = docker.build('docker-login/blog', 'target/docker')
+//    }
+//
+//    stage('publish docker') {
+//        docker.withRegistry('https://registry.hub.docker.com', 'docker-login') {
+//            dockerImage.push 'latest'
+//        }
+//    }
